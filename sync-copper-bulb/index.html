@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en" x-data="app()">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sync Copper Bulb Chain Codec</title>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css" />
+
+    <script>
+      function app() {
+        return {
+          inputText: "",
+          backtrackResult: "",
+          backtrackProcess: [],
+          evolveProcess: [],
+
+          // 获取输入并转换为二进制数组
+          getInput() {
+            return this.inputText.trim()
+              ? this.inputText
+                  .trim()
+                  .split("")
+                  .map((c) => this.charToBinary(c))
+              : null;
+          },
+
+          // 字符到二进制转换
+          charToBinary(c) {
+            switch (c) {
+              case "-":
+              case "_":
+              case " ":
+              case "0":
+                return "0";
+              default:
+                return "1";
+            }
+          },
+
+          // 判断是否为2的幂
+          isPowerOfTwo(n) {
+            return n > 0 && (n & (n - 1)) === 0;
+          },
+
+          // 计算大于等于x的最小2的幂
+          nextPowerOfTwo(x) {
+            return Math.pow(2, Math.ceil(Math.log2(x)));
+          },
+
+          // 创建填充链：循环填充输入直到达到2的幂长度
+          createPaddedChain(chain) {
+            const paddedWidth = this.nextPowerOfTwo(chain.length);
+            return Array.from({ length: paddedWidth }, (_, i) => chain[i % chain.length]);
+          },
+
+          // 计算回溯结果（从回溯数组中提取第一列并反转）
+          calcBacktrackResult(backtrackArray) {
+            return backtrackArray
+              .slice()
+              .reverse()
+              .map((row) => row[0])
+              .join("");
+          },
+
+          // 回溯链计算函数
+          backtrackChain(chain) {
+            if (!chain || chain.length === 0) return [];
+
+            const paddedChain = this.createPaddedChain(chain);
+            const paddedWidth = paddedChain.length;
+            let array = [paddedChain.slice()];
+
+            for (let i = 0; i < paddedWidth - 1; i++) {
+              const lastChain = array[array.length - 1];
+              const validLen = paddedWidth - array.length;
+
+              let newChain = lastChain
+                .slice(0, validLen)
+                .map((val, idx) => (val === (lastChain[idx + 1] || "0") ? "1" : "0"))
+                .concat(new Array(paddedWidth - validLen).fill("?"));
+
+              array.push(newChain);
+            }
+
+            const zeroIndex = array
+              .slice()
+              .reverse()
+              .findIndex((row) => row[0] === "0");
+            return zeroIndex === -1 ? array : array.slice(0, array.length - zeroIndex - 1);
+          },
+
+          // 演化链计算函数
+          evolveChain(chain) {
+            if (!chain || chain.length === 0) return [];
+
+            const chainLen = chain.length;
+            const steps = this.nextPowerOfTwo(chainLen);
+            let current = chain.slice();
+            const result = [current];
+
+            for (let i = 0; i < steps; i++) {
+              current = current.map((right, j) => {
+                const left = j === 0 ? "0" : current[j - 1];
+                return left === "1" ? right : right === "1" ? "0" : "1";
+              });
+              result.push(current.slice());
+            }
+
+            return result;
+          },
+
+          // 处理输入，计算回溯和演化过程
+          processInput() {
+            const binaryArray = this.getInput();
+            const backtrackArray = this.backtrackChain(binaryArray);
+            const evolveArray = this.evolveChain(binaryArray);
+
+            this.backtrackResult = this.calcBacktrackResult(backtrackArray);
+            this.backtrackProcess = backtrackArray;
+            this.evolveProcess = evolveArray;
+          },
+        };
+      }
+    </script>
+  </head>
+  <body>
+    <section class="section">
+      <div class="container">
+        <div class="block">
+          <h1 class="title is-3">Sync Copper Bulb Chain Codec</h1>
+          <p class="subtitle is-5">
+            A tool for calculating synchronized copper bulb chain encoding in Minecraft
+          </p>
+        </div>
+
+        <div class="columns">
+          <div class="column is-5">
+            <div class="block">
+              <div class="field">
+                <label class="label">Input Sequence</label>
+                <div class="control">
+                  <textarea
+                    class="textarea"
+                    placeholder="Enter a sequence of 0s and 1s representing copper bulb states (0 = off, 1 = on)"
+                    rows="5"
+                    spellcheck="false"
+                    x-model="inputText"
+                    @input.debounce.200ms="getInput().length <= 64 && processInput()"
+                  ></textarea>
+                </div>
+                <p class="help">Enter a binary time series or space series.</p>
+              </div>
+
+              <template x-if="getInput().length > 64">
+                <div class="field">
+                  <div class="control">
+                    <button class="button is-primary" @click="processInput()">Calculate</button>
+                  </div>
+                </div>
+              </template>
+            </div>
+            <div class="block content">
+              <h2 class="title is-5">Backtrack (A→B)</h2>
+              <pre x-text="backtrackResult || 'NULL'">NULL</pre>
+
+              <template x-if="getInput() && !isPowerOfTwo(getInput().length)">
+                <div class="notification is-warning">
+                  <p>
+                    <b>Warning:</b>
+                    Input length
+                    <b x-text="getInput().length"></b>
+                    is not a power of two, which doesn't match time series characteristics.
+                  </p>
+                </div>
+              </template>
+            </div>
+
+            <div class="block">
+              <p><a href="../">← Back to Home</a></p>
+            </div>
+          </div>
+
+          <div class="column is-7">
+            <div class="block">
+              <h2 class="title is-5">Backtrack Process</h2>
+              <div class="content">
+                <div x-show="backtrackProcess.length === 0">
+                  <p>No backtrack process to display</p>
+                </div>
+                <div x-show="backtrackProcess.length > 0">
+                  <div class="table-container">
+                    <table class="table is-bordered is-narrow">
+                      <tbody>
+                        <template x-for="(row, index) in backtrackProcess" :key="index">
+                          <tr>
+                            <td
+                              class="has-text-weight-bold has-text-right"
+                              style="width: 1em"
+                              x-text="backtrackProcess.length - index"
+                            ></td>
+                            <td>
+                              <div class="is-flex is-flex-wrap-nowrap">
+                                <template x-for="(cell, cellIndex) in row" :key="cellIndex">
+                                  <span class="px-1" x-text="cell"></span>
+                                </template>
+                              </div>
+                            </td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="block">
+              <h2 class="title is-5">Evolve Process</h2>
+              <div class="content">
+                <div x-show="evolveProcess.length === 0">
+                  <p>No evolve process to display</p>
+                </div>
+                <div x-show="evolveProcess.length > 0">
+                  <div class="table-container">
+                    <table class="table is-bordered is-narrow">
+                      <tbody>
+                        <template x-for="(row, index) in evolveProcess" :key="index">
+                          <tr>
+                            <td
+                              class="has-text-weight-bold has-text-right"
+                              style="width: 1em"
+                              x-text="index"
+                            ></td>
+                            <td>
+                              <div class="is-flex is-flex-wrap-nowrap">
+                                <template x-for="(cell, cellIndex) in row" :key="cellIndex">
+                                  <span class="px-1" x-text="cell"></span>
+                                </template>
+                              </div>
+                            </td>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
