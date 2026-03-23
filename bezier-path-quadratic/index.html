@@ -3,21 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Interactive tool for visualizing and rasterizing quadratic Bezier curves"
-    />
-    <meta name="author" content="Kemi-Amu" />
+    <meta name="color-scheme" content="light dark" />
     <title>Quadratic Bezier Rasterizer</title>
     <link rel="icon" href="../assets/favicon.svg" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-    />
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-    ></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
       document.addEventListener("alpine:init", () => {
         Alpine.data("app", () => ({
@@ -105,12 +95,9 @@
                 dy = Math.abs(p0[1] - p1[1]);
               const sx = p0[0] < p1[0] ? 1 : -1,
                 sy = p0[1] < p1[1] ? 1 : -1;
-              let err =
-                0.5 * (dx - dy) + dy * sx * (p0[0] - x) - dx * sy * (p0[1] - y);
+              let err = 0.5 * (dx - dy) + dy * sx * (p0[0] - x) - dx * sy * (p0[1] - y);
               const points = [];
-              const steps =
-                Math.abs(x - Math.round(p1[0])) +
-                Math.abs(y - Math.round(p1[1]));
+              const steps = Math.abs(x - Math.round(p1[0])) + Math.abs(y - Math.round(p1[1]));
 
               for (let i = 0; i < steps; i++) {
                 if (err < 0) {
@@ -146,16 +133,10 @@
                 const p_start = curve[curve.length - 1];
                 const p_end = calculateBezierPoint(p0, p1, p2, t1);
                 const p_mid = calculateBezierPoint(p0, p1, p2, tm);
-                const mid = [
-                  (p_start[0] + p_end[0]) / 2,
-                  (p_start[1] + p_end[1]) / 2,
-                ];
-                const dist =
-                  (p_mid[0] - mid[0]) ** 2 + (p_mid[1] - mid[1]) ** 2;
+                const mid = [(p_start[0] + p_end[0]) / 2, (p_start[1] + p_end[1]) / 2];
+                const dist = (p_mid[0] - mid[0]) ** 2 + (p_mid[1] - mid[1]) ** 2;
 
-                dist < 0.001
-                  ? curve.push(p_end)
-                  : (stack.push([tm, t1]), stack.push([t0, tm]));
+                dist < 0.001 ? curve.push(p_end) : (stack.push([tm, t1]), stack.push([t0, tm]));
               }
               return curve;
             };
@@ -174,10 +155,7 @@
               const steps = [];
               let currentCount = 1;
               for (let i = 1; i < deltas.length; i++) {
-                if (
-                  deltas[i][0] === deltas[i - 1][0] &&
-                  deltas[i][1] === deltas[i - 1][1]
-                ) {
+                if (deltas[i][0] === deltas[i - 1][0] && deltas[i][1] === deltas[i - 1][1]) {
                   currentCount++;
                 } else {
                   steps.push(currentCount);
@@ -202,10 +180,7 @@
                 }
               }
               if (steps.length > 0) {
-                resultSteps.push([
-                  Math.abs(steps[steps.length - 1]),
-                  currentCount,
-                ]);
+                resultSteps.push([Math.abs(steps[steps.length - 1]), currentCount]);
               }
               return resultSteps;
             };
@@ -229,9 +204,7 @@
     <main>
       <hgroup>
         <h1 x-text="t('Quadratic Bezier Rasterizer')"></h1>
-        <h2
-          x-text="t('Generate rasterized paths for quadratic Bezier curves')"
-        ></h2>
+        <h2 x-text="t('Generate rasterized paths for quadratic Bezier curves')"></h2>
       </hgroup>
 
       <div class="grid">
@@ -311,15 +284,11 @@
     <footer>
       <p><a href="../" x-text="t('← Back to Home')"></a></p>
       <p>
-        <a @click="lang = 'en'; localStorage.setItem('lang', 'en')">
-          English
-        </a>
+        <a @click="lang = 'en'; localStorage.setItem('lang', 'en')"> English </a>
         /
         <a @click="lang = 'zh'; localStorage.setItem('lang', 'zh')"> 中文 </a>
         /
-        <a @click="lang = 'de'; localStorage.setItem('lang', 'de')">
-          Deutsch
-        </a>
+        <a @click="lang = 'de'; localStorage.setItem('lang', 'de')"> Deutsch </a>
       </p>
     </footer>
   </body>

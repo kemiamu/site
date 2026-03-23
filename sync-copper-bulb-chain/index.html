@@ -188,20 +188,14 @@
             <div class="block">
               <h2 class="title is-5">Backtrack Process</h2>
               <div class="content">
-                <div x-show="backtrackProcess.length === 0">
-                  <p>No backtrack process to display</p>
-                </div>
-                <div x-show="backtrackProcess.length > 0">
+                <p x-show="backtrackProcess.length === 0">No backtrack process to display</p>
+                <template x-if="backtrackProcess.length > 0">
                   <div class="table-container">
-                    <table class="table is-bordered is-narrow">
+                    <table class="table is-narrow">
                       <tbody>
                         <template x-for="(row, index) in backtrackProcess" :key="index">
                           <tr>
-                            <td
-                              class="has-text-weight-bold has-text-right"
-                              style="width: 1em"
-                              x-text="backtrackProcess.length - index"
-                            ></td>
+                            <th class="has-text-right" x-text="`${index}.`"></th>
                             <td>
                               <div class="is-flex is-flex-wrap-nowrap">
                                 <template x-for="(cell, cellIndex) in row" :key="cellIndex">
@@ -214,27 +208,21 @@
                       </tbody>
                     </table>
                   </div>
-                </div>
+                </template>
               </div>
             </div>
 
             <div class="block">
               <h2 class="title is-5">Evolve Process</h2>
               <div class="content">
-                <div x-show="evolveProcess.length === 0">
-                  <p>No evolve process to display</p>
-                </div>
-                <div x-show="evolveProcess.length > 0">
+                <p x-show="evolveProcess.length === 0">No evolve process to display</p>
+                <template x-if="evolveProcess.length > 0">
                   <div class="table-container">
-                    <table class="table is-bordered is-narrow">
+                    <table class="table is-narrow">
                       <tbody>
                         <template x-for="(row, index) in evolveProcess" :key="index">
                           <tr>
-                            <td
-                              class="has-text-weight-bold has-text-right"
-                              style="width: 1em"
-                              x-text="index"
-                            ></td>
+                            <th class="has-text-right" x-text="`${index}.`"></th>
                             <td>
                               <div class="is-flex is-flex-wrap-nowrap">
                                 <template x-for="(cell, cellIndex) in row" :key="cellIndex">
@@ -247,7 +235,7 @@
                       </tbody>
                     </table>
                   </div>
-                </div>
+                </template>
               </div>
             </div>
           </div>
