@@ -68,6 +68,7 @@
           // 回溯链计算函数
           backtrackChain(chain) {
             if (!chain || chain.length === 0) return [];
+            if (chain.every((v) => v === chain[0])) return [];
 
             const paddedChain = this.createPaddedChain(chain);
             const paddedWidth = paddedChain.length;
@@ -164,7 +165,7 @@
             </div>
             <div class="block content">
               <h2 class="title is-5">Backtrack (A→B)</h2>
-              <pre x-text="backtrackResult || 'NULL'">NULL</pre>
+              <pre x-text="backtrackResult || 'No Solution'">No Solution</pre>
 
               <template x-if="getInput().length && !isPowerOfTwo(getInput().length)">
                 <div class="notification is-warning">
